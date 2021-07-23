@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20F71" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Movie" representedClassName=".DBMovie" syncable="YES">
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="rating" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="tmdbId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="notes" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Note" inverseName="movie" inverseEntity="Note"/>
+    </entity>
+    <entity name="Note" representedClassName=".DBNote" syncable="YES">
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="modified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="text" attributeType="String" defaultValueString=""/>
+        <relationship name="movie" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Movie" inverseName="notes" inverseEntity="Movie"/>
+    </entity>
+    <elements>
+        <element name="Movie" positionX="-63" positionY="-18" width="128" height="89"/>
+        <element name="Note" positionX="-54" positionY="-9" width="128" height="89"/>
+    </elements>
+</model>
