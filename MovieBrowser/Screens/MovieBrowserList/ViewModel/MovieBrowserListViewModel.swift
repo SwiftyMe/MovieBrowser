@@ -83,7 +83,7 @@ extension MovieBrowserListViewModel {
         }
         
         func storePageItem(item: Int, cancellable: AnyCancellable) {
-            itemCancellables[item] = nil
+            itemCancellables[item] = cancellable
         }
         
         func finalizePageItem(item: Int) {
@@ -216,7 +216,7 @@ extension MovieBrowserListViewModel {
             }
         }
         
-        if item.visible && !searchText.isEmpty {
+        if item.visible && searchText.isEmpty {
             updateContinuousPagination(item:item)
         }
     }
@@ -226,7 +226,7 @@ extension MovieBrowserListViewModel {
     ///
     private func updateContinuousPagination(item:MovieBrowserItemViewModel) {
 
-        guard let pageMax = pageMax, let pageSize = pageSize, page < pageMax, !searchText.isEmpty else {
+        guard let pageMax = pageMax, let pageSize = pageSize, page < pageMax, searchText.isEmpty else {
             return
         }
 
