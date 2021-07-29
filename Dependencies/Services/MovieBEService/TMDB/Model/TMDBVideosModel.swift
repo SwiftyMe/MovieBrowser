@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VideosModel: Codable {
+struct TMDBVideosModel: Codable {
     let id: Int
-    let results: [VideoModel]?
+    let results: [TMDBVideoModel]?
 }

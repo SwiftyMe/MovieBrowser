@@ -7,17 +7,17 @@
 
 import Foundation
 
-struct MovieDetailModel: Codable {
+struct TMDBMovieDetailModel: Codable {
     let id: Int
     let posterPath: String?
     let title: String?
     let overview: String?
     let releaseDate: String?
-    let genres: [GenreModel]?
+    let genres: [TMDBGenreModel]?
     let voteAverage: Float?
 }
 
-extension MovieDetailModel {
+extension TMDBMovieDetailModel {
     
     ///
     /// Translate to camel casing

@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct VideoModel: Codable {
+struct TMDBVideoModel: Codable {
     let id: String?
     let key: String?
     let site: String?

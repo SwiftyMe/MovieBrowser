@@ -9,14 +9,14 @@
 import Foundation
 
 
-struct MoviesModel: Codable {
+struct TMDBMoviesModel: Codable {
     let page: Int?
-    let results: [MovieModel]?
+    let results: [TMDBMovieModel]?
     let totalResults: Int?
     let totalPages: Int?
 }
 
-extension MoviesModel {
+extension TMDBMoviesModel {
     
     ///
     /// Translate to camel casing

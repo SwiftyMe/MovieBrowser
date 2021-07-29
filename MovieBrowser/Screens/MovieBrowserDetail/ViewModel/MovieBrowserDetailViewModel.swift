@@ -10,12 +10,13 @@ import SwiftUI
 import Combine
 import CoreData
 import Reusable
+import MovieBEService
 
 ///
 /// View-model class for the Movie Browser screen view
 ///
-class MovieBrowserDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBContext {
- 
+class MovieBrowserDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBContext, MovieServiceDetailDelegate {
+
     @Published var error: String?
     
     let title: String
@@ -40,44 +41,48 @@ class MovieBrowserDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCont
             return
         }
         
-        updateImage()
-        updateGenres()
-        updateMovie()
-        updateSaved()
+        fetchModelDetail()
     
         appeared = true
     }
     
     func onDisappear() { }
     
-    init(model: MovieModel, api: MovieAPI, moc: NSManagedObjectContext) {
+    init(model: MovieModel, movieService: MovieService, moc: NSManagedObjectContext) {
         
         print("\(type(of: self)) - init \(model.id)")
         
         self.model = model
-        self.api = api
+        self.movieService = movieService
         self.moc = moc
         
-        title = model.title ?? ""
+        title = model.title
         releaseDate = model.releaseDate ?? ""
-        overview = model.overview ?? ""
-        genres = ""
+        overview = model.overview
+        genres = model.genres.map({ $0.description }).joined(separator:", ")
         averageVote = model.voteAverage == nil ? nil : String(format:"%.1f", model.voteAverage!)
         saved = false
+        modelDetail = nil
+        
+        self.movieService.detailDelegate = self
+        
+        updateRegisteredMovie()
+        updatePropertySaved()
+        
+        print(self.genres)
     }
     
     deinit {
         print("\(type(of: self)) - deinit \(model.id)")
     }
     
-    private let model: MovieModel
     var moc: NSManagedObjectContext
-    private let api: MovieAPI
-
+    
+    private let model: MovieModel
+    private var movieService: MovieService
+    private var modelDetail: MovieDetailModel?
+    private var registeredMovie: DBMovie?
     private var appeared = false
-    private var cancellableImage: AnyCancellable?
-    private var cancellableGenres: AnyCancellable?
-    private var movie: DBMovie?
 }
 
 extension MovieBrowserDetailViewModel {
@@ -92,92 +97,68 @@ extension MovieBrowserDetailViewModel {
     
     private func didSetSaved(_ save: Bool) {
         
-        if movie == nil {
+        if registeredMovie == nil {
             
             if save {
-                movie = DBMovie.create(moc)
-                movie!.tmdbId = Int32(model.id)
+                registeredMovie = DBMovie.create(moc)
+                registeredMovie!.tmdbId = Int32(model.id)
                 storeSave()
             }
         }
         else {
             
             if !save {
-                moc.delete(movie!)
+                moc.delete(registeredMovie!)
                 storeSave()
             }
         }
     }
     
-    private func updateSaved() {
-        saved = movie != nil
+    private func updatePropertySaved() {
+        saved = registeredMovie != nil
     }
 }
 
 extension MovieBrowserDetailViewModel {
     
-    private func updateMovie() {
+
+    private func updateRegisteredMovie() {
         
         do {
-            movie = try DBMovie.fetchMovieWithId(id: Int32(model.id), moc:moc)
+            registeredMovie = try DBMovie.fetchMovieWithId(id: Int32(model.id), moc:moc)
         }
         catch {
             storeError(error)
         }
     }
     
-    private func updateImage() {
-
-        guard let posterPath = model.posterPath else {
-           return
-        }
-
-        cancellableImage = api.mediaObject(path:posterPath, size:nil, type:.JPG).sink(
-            receiveCompletion: { [weak self] completion in
-                guard let self = self else { return }
-                if case .failure(let error) = completion {
-                    self.error = error.localizedDescription
-                    assert(false)
-                }
-            },
-            receiveValue: { [weak self] value in
-                guard let self = self else { return }
-                self.posterImage = value
-            })
+    private func updatePropertyImage() {
+        
+        posterImage = modelDetail?.posterImage
     }
     
-    private func updateGenres() {
-
-        guard let genreIds = model.genres, !genreIds.isEmpty else {
-           return
-        }
+    private func updatePropertyGenres() {
         
-        cancellableGenres = api.movieGenres().sink(
-            receiveCompletion: { completion in
-                if case .failure = completion { assert(false) }
-            },
-            receiveValue: { [weak self] value in
-                guard let self = self else { return }
-                self.initGenres(map:value)
-            })
     }
     
-    /// Converts the object's genre ids to string representation using the provided map
-    private func initGenres(map:[GenreModel]) {
+    private func fetchModelDetail() {
         
-        guard let genreIds = model.genres, !genreIds.isEmpty else {
-           return
-        }
+        movieService.fetchDetailModel(model: model)
+    }
+}
+
+
+extension MovieBrowserDetailViewModel {
+    
+    func movieDetail(model: MovieDetailModel) {
         
-        genres = ""
+        modelDetail = model
         
-        for id in genreIds {
-            
-            if let name = map.first(where: { $0.id == id })?.name {
-                genres += name + ", "
-            }
-        }
+        updatePropertyImage()
+        updatePropertyGenres()
+    }
+    
+    func error(_: MovieServiceError) {
         
-        genres = String(genres.dropLast(2))
     }
 }

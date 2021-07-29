@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import CoreData
+import MovieBEService
 
 @main
 struct MovieBrowserApp: App {
@@ -29,7 +30,7 @@ struct MovieBrowserApp: App {
             
             if store.success {
                 
-                MovieBrowserListView(viewModel: MovieBrowserListViewModel(api:MovieAPIKey.defaultValue))
+                MovieBrowserListView(viewModel: MovieBrowserListViewModel(service:MovieServiceKey.defaultValue))
                     .environment(\.managedObjectContext, store.managedObjectContext!)
             }
             else if let error = store.error {
@@ -44,14 +45,14 @@ struct MovieBrowserApp: App {
     }
 }
 
-private struct MovieAPIKey: EnvironmentKey {
-    static let defaultValue: MovieAPI = MovieAPIImpl()
+private struct MovieServiceKey: EnvironmentKey {
+    static let defaultValue: MovieService = MovieServiceImplementation()
 }
 
 extension EnvironmentValues {
-  var movieAPI: MovieAPI {
-    get { self[MovieAPIKey.self] }
-    set { self[MovieAPIKey.self] = newValue }
+  var movieService: MovieService {
+    get { self[MovieServiceKey.self] }
+    set { self[MovieServiceKey.self] = newValue }
   }
 }
 

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Reusable
+import MovieBEService
 
 struct MovieRegisterDetailView: View {
     
@@ -205,13 +206,13 @@ extension MovieRegisterDetailView.Tabs: CustomStringConvertible, Identifiable {
 
 
 struct MovieRegisterDetailView_Previews: PreviewProvider {
-    static let posterPath = "xipF6XqfSYV8DxLqfLN6aWlwuRp.jpg"
+    static let service = MovieServiceImplementation()
     static let store = PersistentStore(storeName: "MovieBrowser")
-    static let genres = [GenreModel(id: 1, name:"Drama")]
-    static let model = MovieDetailModel(id: 1, posterPath:posterPath, title:"The Tomorrow war", overview:Strings.loremIpsumLong, releaseDate:"2021-07-11", genres:genres, voteAverage:5.6)
+    static let genres = [MovieGenre.drama,MovieGenre.thriller]
+    static let model = MovieDetailModel(id: 1, posterImage:nil, title:"The Tomorrow war", overview:Strings.loremIpsumLong, genres:genres, releaseDate:"2021-07-11", voteAverage:5.6)
     
     static var previews: some View {
         MovieRegisterDetailView(viewModel:
-            MovieRegisterDetailViewModel(movie: DBMovie.create(store.managedObjectContext!), model: model, api: MovieAPIImpl()))
+                                    MovieRegisterDetailViewModel(movie: DBMovie.create(store.managedObjectContext!), model: model, service:service))
     }
 }

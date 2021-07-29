@@ -7,11 +7,12 @@
 
 import Foundation
 import Reusable
+import MovieBEService
 
 ///
 /// View-model class for a browser movie item
 ///
-class GenreFilterItemViewModel: ObservableObject, Identifiable, Hashable, JSONModelObjectAccessor {
+class GenreFilterItemViewModel: ObservableObject, Identifiable, Hashable {
     
     static func == (lhs: GenreFilterItemViewModel, rhs: GenreFilterItemViewModel) -> Bool {
         lhs.id == rhs.id
@@ -20,29 +21,24 @@ class GenreFilterItemViewModel: ObservableObject, Identifiable, Hashable, JSONMo
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
-    /// ModelObjectAccessor conformance
-    var modelObject: GenreModel {
-        model
-    }
+
 
     /// Identifiable conformance
-    var id: Int {
-        model.id
+    var id: String {
+        model
     }
     
     var name: String {
-        model.name ?? ""
+        model
     }
     
     @Published var included: Bool
     
-    init(model: GenreModel) {
+    init(model: String, isIncluded: Bool) {
 
         self.model = model
-        
-        included = true
+        self.included = isIncluded
     }
     
-    private let model: GenreModel
+    private let model: String
 }

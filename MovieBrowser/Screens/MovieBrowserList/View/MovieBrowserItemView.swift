@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MovieBEService
 
 struct MovieBrowserItemView: View {
     
@@ -51,15 +52,20 @@ struct MovieBrowserItemView: View {
         .onAppear(perform: { viewModel.onAppear() })
         .onDisappear(perform: { viewModel.onDisappear() })
     }
+    
+    func debug() -> some View {
+        print("MovieBrowserItemView \(viewModel.posterImage)")
+        return EmptyView()
+    }
 }
 
 struct MovieBrowserItemView_Previews: PreviewProvider {
-    static let posterPath = "xipF6XqfSYV8DxLqfLN6aWlwuRp.jpg"
-    static let model = MovieModel(id: 1, posterPath:posterPath, title:"title", overview:nil, releaseDate:nil, genres:nil, voteAverage: nil)
+    static let service = MovieServiceImplementation()
+    static let model = MovieModel(id: 1, posterImage:nil, title:"title", overview:"", genres:[.drama], releaseDate:nil, voteAverage: nil)
     static var previews: some View {
         HStack {
-            MovieBrowserItemView(viewModel: MovieBrowserItemViewModel(model:model, api:MovieAPIImpl()))
-            MovieBrowserItemView(viewModel: MovieBrowserItemViewModel(model:model, api:MovieAPIImpl()))
+            MovieBrowserItemView(viewModel: MovieBrowserItemViewModel(model: model, service: service))
+            MovieBrowserItemView(viewModel: MovieBrowserItemViewModel(model: model, service: service))
         }
         .padding()
     }

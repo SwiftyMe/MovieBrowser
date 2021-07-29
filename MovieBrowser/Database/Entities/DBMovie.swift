@@ -8,6 +8,9 @@
 import Foundation
 import CoreData
 
+enum DBPriority: Int16 {
+    case low, medium, high
+}
 
 class DBMovie: NSManagedObject, DBCreatable  {
 
@@ -16,6 +19,7 @@ class DBMovie: NSManagedObject, DBCreatable  {
     @NSManaged var tmdbId: Int32
     @NSManaged var created: Date
     @NSManaged var rating: Int16 // 0 ... 100
+    @NSManaged var priority: Int16 // enum DBPriority
     
     // Relations
 

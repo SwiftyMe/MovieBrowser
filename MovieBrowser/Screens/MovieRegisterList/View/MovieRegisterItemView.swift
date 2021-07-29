@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MovieBEService
 
 struct MovieRegisterItemView: View {
     
@@ -81,7 +82,8 @@ struct MovieRegisterItemView: View {
 
 struct MovieRegisterItemView_Previews: PreviewProvider {
     static let store = PersistentStore(storeName: "MovieBrowser")
+    static let service = MovieServiceImplementation()
     static var previews: some View {
-        MovieRegisterItemView(viewModel: MovieRegisterItemViewModel(movie:DBMovie.create(store.managedObjectContext!),api:MovieAPIImpl()))
+        MovieRegisterItemView(viewModel: MovieRegisterItemViewModel(movie:DBMovie.create(store.managedObjectContext!), service:service))
     }
 }

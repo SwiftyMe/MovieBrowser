@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import CoreData
 import Reusable
+import MovieBEService
 
 ///
 ///
@@ -73,18 +74,18 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
         return item
     }
     
-    init(movie: DBMovie, model: MovieDetailModel, api: MovieAPI) {
+    init(movie: DBMovie, model: MovieDetailModel, service: MovieService) {
         
         print("MovieRegisterDetailViewModel - init \(movie.tmdbId)")
         
         self.movie = movie
         self.model = model
-        self.api = api
+        self.service = service
         self.moc = movie.managedObjectContext!
 
-        title = model.title ?? ""
+        title = model.title
         releaseDate = model.releaseDate ?? ""
-        overview = model.overview ?? ""
+        overview = model.overview
         genres = ""
         averageVote = model.voteAverage == nil ? nil : String(format:"%.1f", model.voteAverage!)
         
@@ -101,10 +102,9 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
     
     private var movie: DBMovie
     private let model: MovieDetailModel
-
-    private let api: MovieAPI
+    private let service: MovieService
+    
     private var appeared = false
-    private var cancellableImage: AnyCancellable?
 }
 
 extension MovieRegisterDetailViewModel {
@@ -137,23 +137,6 @@ extension MovieRegisterDetailViewModel {
 extension MovieRegisterDetailViewModel {
     
     private func updatePropertyImage() {
-
-        guard let posterPath = model.posterPath else {
-           return
-        }
-
-        cancellableImage = api.mediaObject(path:posterPath, size:nil, type:.JPG)
-            .sink(receiveCompletion: { [weak self] completion in
-                guard let self = self else { return }
-                if case .failure(let error) = completion {
-                    self.error = error.localizedDescription
-                    assert(false)
-                }
-            },
-            receiveValue: { [weak self] value in
-                guard let self = self else { return }
-                self.posterImage = value
-            })
     }
     
     func updatePropertyRating() {
@@ -168,8 +151,8 @@ extension MovieRegisterDetailViewModel {
         
         var genreNames = ""
         
-        for genre in model.genres ?? [] where genre.name != nil && !genre.name!.isEmpty {
-            genreNames += genre.name! + ", "
+        for genre in model.genres where !genre.description.isEmpty {
+            genreNames += genre.description + ", "
         }
         
         genres = String(genreNames.dropLast(2))

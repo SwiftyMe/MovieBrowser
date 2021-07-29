@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import CoreData
 import Reusable
+import MovieBEService
 
 
 ///

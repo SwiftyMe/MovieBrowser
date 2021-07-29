@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct GenreModel: Codable {
+struct TMDBGenreModel: Codable {
     let id: Int
     let name: String?
 }

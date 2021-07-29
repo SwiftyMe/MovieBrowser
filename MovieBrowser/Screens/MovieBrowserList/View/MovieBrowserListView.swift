@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Reusable
+import MovieBEService
 
 struct MovieBrowserListView: View {
     
@@ -15,7 +16,7 @@ struct MovieBrowserListView: View {
     /// Private
     
     @Environment(\.managedObjectContext) private var moc
-    @Environment(\.movieAPI) private var api
+    @Environment(\.movieService) private var movieService
     
     @State private var searchVisible = false
     @State private var clicked = false
@@ -52,7 +53,7 @@ struct MovieBrowserListView: View {
                 else {
                     
                     Picker("", selection:$viewModel.movieList) {
-                        ForEach(Array(MovieBrowserListViewModel.MovieList.allCases)) { list in
+                        ForEach(Array(MovieList.allCases)) { list in
                             Text(list.description)
                                 .tag(list)
                         }
@@ -81,7 +82,7 @@ extension MovieBrowserListView {
     private func navigationLink(movie: MovieBrowserItemViewModel) -> some View {
         
        NavigationLink(
-            destination: MovieBrowserDetailView(viewModel:MovieBrowserDetailViewModel(model:movie.modelObject, api:api, moc:moc)),
+            destination: MovieBrowserDetailView(viewModel:MovieBrowserDetailViewModel(model:movie.modelObject, movieService:movieService, moc:moc)),
             label: { MovieBrowserItemView(viewModel: movie).id(movie.id) })
     }
     
@@ -169,7 +170,7 @@ extension MovieBrowserListView {
     
     private var navbarTrailingView2: some View {
         NavigationLink(
-            destination: MovieRegisterListView(viewModel: MovieRegisterListViewModel(moc:moc, api:api)), label: {
+            destination: MovieRegisterListView(viewModel: MovieRegisterListViewModel(moc:moc, movieService: movieService)), label: {
                 Image(systemName:"archivebox")
             })
     }
@@ -199,10 +200,10 @@ extension MovieBrowserListView {
 ///
 ///
 ///
-extension MovieBrowserListViewModel.MovieList: CustomStringConvertible, Identifiable {
+extension MovieList: CustomStringConvertible, Identifiable {
     
-    var id: Int {
-        rawValue
+    public var id: String {
+        description
     }
     
     public var description: String {
@@ -217,7 +218,8 @@ extension MovieBrowserListViewModel.MovieList: CustomStringConvertible, Identifi
 
 
 struct MovieBrowseView_Previews: PreviewProvider {
+    static let service = MovieServiceImplementation()
     static var previews: some View {
-        MovieBrowserListView(viewModel:MovieBrowserListViewModel(api:MovieAPIImpl()))
+        MovieBrowserListView(viewModel:MovieBrowserListViewModel(service:service))
     }
 }

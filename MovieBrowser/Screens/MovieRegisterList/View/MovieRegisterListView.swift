@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MovieBEService
 
 struct MovieRegisterListView: View {
     
@@ -15,7 +16,7 @@ struct MovieRegisterListView: View {
     
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.managedObjectContext) private var moc
-    @Environment(\.movieAPI) private var api
+    @Environment(\.movieService) private var movieService
     
     @State private var selectedMovie: MovieRegisterItemViewModel? = nil
     @State private var editMode = EditMode.inactive
@@ -61,13 +62,13 @@ struct MovieRegisterListView: View {
             MovieRegisterItemView(viewModel: movie)
                 .background(Color.white)
                 .onTapGesture {
-                    selectedMovie = movie
+                    if movie.modelObject != nil {
+                        selectedMovie = movie
+                    }
                 }
 
             NavigationLink(
-                destination:
-                    MovieRegisterDetailView(viewModel: MovieRegisterDetailViewModel(movie: movie.registeredMovie, model: movie.modelObject, api:api)),
-                tag:movie, selection:$selectedMovie, label: { EmptyView() })
+                destination: MovieRegisterDetailView(viewModel: MovieRegisterDetailViewModel(movie: movie.registeredMovie, model: movie.modelObject!, service: movieService)), tag:movie, selection:$selectedMovie, label: { EmptyView() })
                 .disabled(true)
                 .hidden()
         }
@@ -100,7 +101,8 @@ extension MovieRegisterListView {
 
 struct MovieRegisterListView_Previews: PreviewProvider {
     static let store = PersistentStore(storeName: "MovieBrowser")
+    static let service = MovieServiceImplementation()
     static var previews: some View {
-        MovieRegisterListView(viewModel: MovieRegisterListViewModel(moc: store.managedObjectContext!, api: MovieAPIImpl()))
+        MovieRegisterListView(viewModel: MovieRegisterListViewModel(moc: store.managedObjectContext!, movieService:service))
     }
 }

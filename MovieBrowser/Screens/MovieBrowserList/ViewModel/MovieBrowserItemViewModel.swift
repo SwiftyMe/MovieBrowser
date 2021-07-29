@@ -9,34 +9,22 @@ import Foundation
 import SwiftUI
 import Combine
 import Reusable
+import MovieBEService
 
 ///
 /// View-model class for a browser movie item
 ///
-class MovieBrowserItemViewModel: ObservableObject, Identifiable, Hashable, JSONModelObjectAccessor, ViewLifeCycleEvents {
-    
-    static func == (lhs: MovieBrowserItemViewModel, rhs: MovieBrowserItemViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    /// ModelObjectAccessor conformance
-    var modelObject: MovieModel {
-        model
-    }
+class MovieBrowserItemViewModel: ObservableObject, IdentifiableHashable, ModelObjectAccessor,
+                                 ViewLifeCycleEvents, MovieServiceBrowseItemDelegate {
 
-    /// Identifiable conformance
-    var id: Int {
-        model.id
-    }
+    var modelObject: MovieModel { model }  /// ModelObjectAccessor conformance
+    
+    var id: Int { model.id }  /// Identifiable conformance
     
     @Published var title: String
     @Published var posterImage: UIImage?
     
-    @Published var visible = false {
+    var visible = false {
         didSet {
             visibleChanged.send(self)
         }
@@ -46,41 +34,63 @@ class MovieBrowserItemViewModel: ObservableObject, Identifiable, Hashable, JSONM
 
     func onAppear() {
 
+        assert(!visible)
+        
         guard !visible else { return }
         
+        print("MovieBrowserItemViewModel onAppear \(id)")
+        
+        service.updateItemWhenVisible(model:model, delegate:self)
+        
         visible = true
-        updatePosterImage()
     }
     
     func onDisappear() {
-    }
-    
-    init(model: MovieModel, api: MovieAPI) {
-
-        self.model = model
-        self.api = api
         
-        title = model.title ?? ""
+        visible = false
+        
+        print("MovieBrowserItemViewModel onDisappear \(id)")
     }
     
-    private let model: MovieModel
-    private let api: MovieAPI
-    private var cancellable: AnyCancellable?
+    init(model: MovieModel, service: MovieService) {
+
+        print("MovieBrowserItemViewModel init \(model.id)")
+        
+        self.model = model
+        self.service = service
+
+        self.title = model.title
+    }
+    
+    private var model: MovieModel
+    private var service: MovieService
 }
 
 
 extension MovieBrowserItemViewModel {
     
-    private func updatePosterImage() {
-
-        guard let posterPath = model.posterPath else {
-           return
-        }
-        
-        cancellable = api.mediaObject(path:posterPath, size:200, type:.JPG).sink(
-            receiveCompletion: { _ in },
-            receiveValue: { [weak self] value in
-                self?.posterImage = value
-            })
+    private func updatePropertyPosterImage() {
+        posterImage = model.posterImage
+    }
+    
+    private func updatePropertyTitle() {
+        title = model.title
     }
 }
+
+
+extension MovieBrowserItemViewModel {
+    
+    func updateMovie(model: MovieModel) {
+        self.model = model
+        updatePropertyPosterImage()
+        updatePropertyTitle()
+    }
+    
+    func error(_: MovieServiceError) {
+        assert(false)
+    }
+}
+
+
+

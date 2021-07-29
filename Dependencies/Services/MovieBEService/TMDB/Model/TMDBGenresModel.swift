@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct GenresModel: Codable {
-    let genres: [GenreModel]?
+struct TMDBGenresModel: Codable {
+    let genres: [TMDBGenreModel]?
 }
 

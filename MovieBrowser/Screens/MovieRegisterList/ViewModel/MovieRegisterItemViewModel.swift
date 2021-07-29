@@ -10,12 +10,13 @@ import Foundation
 import SwiftUI
 import Combine
 import Reusable
+import MovieBEService
 
 ///
 /// View-model class for a user-registered movie
 ///
-class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, JSONModelObjectAccessor, ViewLifeCycleEvents  {
-    
+class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, ModelObjectOptionalAccessor, ViewLifeCycleEvents  {
+
     static func == (lhs: MovieRegisterItemViewModel, rhs: MovieRegisterItemViewModel) -> Bool {
         lhs.id == rhs.id
     }
@@ -30,11 +31,8 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, JSON
     }
     
     /// ModelObjectAccessor conformance
-    var modelObject: MovieDetailModel {
-        if let model = model {
-            return model
-        }
-        return MovieDetailModel(id:-1, posterPath:nil, title:nil, overview:nil, releaseDate:nil, genres:nil, voteAverage: nil)
+    var modelObject: MovieDetailModel? {
+        model
     }
     
     var registeredMovie: DBMovie {
@@ -68,12 +66,12 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, JSON
         print("MovieRegisterItemViewModel - onDisappear")
     }
 
-    init(movie: DBMovie, api: MovieAPI) {
+    init(movie: DBMovie, service: MovieService) {
       
         print("MovieRegisterItemViewModel - init \(movie.tmdbId)")
         
         self.movie = movie
-        self.api = api
+        self.service = service
         self.model = nil
     }
     
@@ -84,43 +82,13 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, JSON
     
     private var movie: DBMovie
     private var model: MovieDetailModel?
-    private let api: MovieAPI
-    
-    private var cancellable: AnyCancellable?
+    private let service: MovieService
     private var appeared = false
 }
 
 
 extension MovieRegisterItemViewModel {
     
-    private func updateMovieModel() {
-        
-        cancellable = api.movieDetail(id: Int(movie.tmdbId)).sink(receiveCompletion: { completion in
-            print("MovieRegisterItemViewModel - receiveCompletion")
-        },
-        receiveValue: { [weak self] value in
-            guard let self = self else { return }
-            self.model = value
-            self.updateTitle()
-            self.updateOverview()
-            self.updatePosterImage()
-            self.updateRating()
-        })
-    }
-    
-    private func updatePosterImage() {
-
-        guard let posterPath = model?.posterPath else {
-            return
-        }
-            
-        cancellable = api.mediaObject(path:posterPath, size:200, type:.JPG).sink(
-            receiveCompletion: { _ in },
-            receiveValue: { [weak self] value in
-                self?.posterImage = value
-            })
-    }
-
     func updateTitle() {
         title = model?.title ?? ""
     }
@@ -131,6 +99,11 @@ extension MovieRegisterItemViewModel {
     
     func updateRating() {
         rating = movie.rating == 0 ? "My Rating:" : String(format: "My Rating: %.1f", 0.1 * Double(movie.rating))
+    }
+    
+    func updateMovieModel() {
+        
+        
     }
 }
 

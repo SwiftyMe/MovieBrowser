@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Reusable
+import MovieBEService
 
 struct MovieNoteItemView: View {
     

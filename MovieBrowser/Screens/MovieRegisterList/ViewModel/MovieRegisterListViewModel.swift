@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import CoreData
 import Reusable
+import MovieBEService
 
 ///
 ///
@@ -36,15 +37,15 @@ class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBConte
     func onDisappear() {
     }
     
-    init(moc: NSManagedObjectContext, api: MovieAPI) {
+    init(moc: NSManagedObjectContext, movieService: MovieService) {
         
         self.moc = moc
-        self.api = api
+        self.movieService = movieService
     }
     
     var moc: NSManagedObjectContext
     
-    private let api: MovieAPI
+    private let movieService: MovieService
     private var appeared = false
 }
 
@@ -54,7 +55,7 @@ extension MovieRegisterListViewModel {
 
         do {
             
-            movies = try DBObjects.fetchAll(moc:moc).map( { MovieRegisterItemViewModel(movie:$0!, api:api) } )
+            movies = try DBObjects.fetchAll(moc:moc).map( { MovieRegisterItemViewModel(movie:$0!, service:movieService) } )
             
             sortMovies()
         }

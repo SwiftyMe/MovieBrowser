@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Reusable
+import MovieBEService
 
 struct MovieBrowserDetailView: View {
     
@@ -105,10 +106,10 @@ struct MovieBrowserDetailView_Previews: PreviewProvider {
     static let title = "Movie Title"
     static let posterPath = "xipF6XqfSYV8DxLqfLN6aWlwuRp.jpg"
     static let store = PersistentStore(storeName: "MovieBrowser")
-    static let genres = [1,2]
+    static let genres = [MovieGenre.drama,MovieGenre.thriller]
     static let releaseDate = "12-12-2021"
-    static let model = MovieModel(id: 1, posterPath:posterPath, title:title, overview:Strings.loremIpsumShort, releaseDate:releaseDate, genres:genres, voteAverage: 5.5)
+    static let model = MovieModel(id: 1, posterImage:nil, title:title, overview:Strings.loremIpsumShort, genres:genres, releaseDate: releaseDate, voteAverage: 5.5)
     static var previews: some View {
-        MovieBrowserDetailView(viewModel: MovieBrowserDetailViewModel(model:model, api:MovieAPIImpl(), moc:Self.store.managedObjectContext!))
+        MovieBrowserDetailView(viewModel: MovieBrowserDetailViewModel(model:model, movieService: MovieServiceImplementation(), moc:Self.store.managedObjectContext!))
     }
 }
