@@ -115,6 +115,7 @@ extension MovieBrowserListView {
                 
                 ForEach(viewModel.genreFilter) { filter in
                     GenreFilterView(genre:filter)
+                        .padding(.trailing,10)
                 }
                 .padding(.horizontal)
             }

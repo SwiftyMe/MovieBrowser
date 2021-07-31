@@ -15,7 +15,7 @@ import MovieBEService
 ///
 ///
 ///
-class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBContext {
+class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBContext, MovieServiceDetailDelegate {
 
     @Published var error: String?
     
@@ -39,13 +39,21 @@ class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBConte
     
     init(moc: NSManagedObjectContext, movieService: MovieService) {
         
+        print("\(type(of: self)) - init")
+        
         self.moc = moc
         self.movieService = movieService
+        
+        self.movieService.detailDelegate = self
+    }
+    
+    deinit {
+        print("\(type(of: self)) - deinit")
     }
     
     var moc: NSManagedObjectContext
     
-    private let movieService: MovieService
+    private var movieService: MovieService
     private var appeared = false
 }
 
@@ -90,7 +98,24 @@ extension MovieRegisterListViewModel {
     }
 }
 
+///
+/// MovieServiceDetailDelegate conformance
+///
+extension MovieRegisterListViewModel {
+    
+    func movieDetail(model: MovieDetailModel) {
+        if let movie = movies.first(where: { $0.id == model.id }) {
+            movie.updateModel(model: model)
+        }
+    }
+    
+    func error(_: MovieServiceError) {
+    }
+}
 
+///
+/// DBContext conformance
+///
 extension MovieRegisterListViewModel {
     
     func storeError(_ error: Error) {

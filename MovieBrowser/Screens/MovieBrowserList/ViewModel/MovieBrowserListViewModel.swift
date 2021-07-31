@@ -89,6 +89,12 @@ extension MovieBrowserListViewModel {
         createGenreFilter()
     }
     
+    func updateModel(model: MovieModel) {
+        if let movie = movies.first(where: { $0.id == model.id }) {
+            movie.updateModel(model: model)
+        }
+    }
+
     func error(_ error: MovieServiceError) {
         
         self.error = error.localizedDescription
@@ -161,7 +167,7 @@ extension MovieBrowserListViewModel {
             }
         }
         
-        if item.visible && searchText.isEmpty {
+        if item.visible {
             
             movieService.itemBecameVisible(id: item.id)
         }

@@ -14,12 +14,11 @@ import MovieBEService
 ///
 /// View-model class for a browser movie item
 ///
-class MovieBrowserItemViewModel: ObservableObject, IdentifiableHashable, ModelObjectAccessor,
-                                 ViewLifeCycleEvents, MovieServiceBrowseItemDelegate {
-
-    var modelObject: MovieModel { model }  /// ModelObjectAccessor conformance
+class MovieBrowserItemViewModel: ObservableObject, IdentifiableHashable, ModelObjectAccessor, ViewLifeCycleEvents {
     
     var id: Int { model.id }  /// Identifiable conformance
+    
+    var modelObject: MovieModel { model }  /// ModelObjectAccessor conformance
     
     @Published var title: String
     @Published var posterImage: UIImage?
@@ -40,7 +39,7 @@ class MovieBrowserItemViewModel: ObservableObject, IdentifiableHashable, ModelOb
         
         print("MovieBrowserItemViewModel onAppear \(id)")
         
-        service.updateItemWhenVisible(model:model, delegate:self)
+        movieService.updateModel(model: model)
         
         visible = true
     }
@@ -57,13 +56,13 @@ class MovieBrowserItemViewModel: ObservableObject, IdentifiableHashable, ModelOb
         print("MovieBrowserItemViewModel init \(model.id)")
         
         self.model = model
-        self.service = service
+        self.movieService = service
 
         self.title = model.title
     }
     
     private var model: MovieModel
-    private var service: MovieService
+    private var movieService: MovieService
 }
 
 
@@ -81,14 +80,10 @@ extension MovieBrowserItemViewModel {
 
 extension MovieBrowserItemViewModel {
     
-    func updateMovie(model: MovieModel) {
+    func updateModel(model: MovieModel) {
         self.model = model
         updatePropertyPosterImage()
         updatePropertyTitle()
-    }
-    
-    func error(_: MovieServiceError) {
-        assert(false)
     }
 }
 

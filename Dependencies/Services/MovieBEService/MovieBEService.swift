@@ -23,6 +23,8 @@ public protocol MovieServiceBrowseDelegate: MovieServiceErrorDelegate {
     
     func newMovies(list: MovieList, models: [MovieModel])
     
+    func updateModel(model: MovieModel)
+    
     func genresUpdated() 
 }
 
@@ -31,10 +33,6 @@ public protocol MovieServiceDetailDelegate: MovieServiceErrorDelegate {
     func movieDetail(model: MovieDetailModel)
 }
 
-public protocol MovieServiceBrowseItemDelegate: MovieServiceErrorDelegate {
-    
-    func updateMovie(model: MovieModel)
-}
 
 
 public protocol MovieService {
@@ -54,10 +52,11 @@ public protocol MovieService {
     
     func fetchItems(list: MovieList)
     
+    func updateModel(model: MovieModel)
+    
+    func fetchDetailModel(id: ModelId)
     func fetchDetailModel(model: MovieModel)
 
-    func updateItemWhenVisible(model: MovieModel, delegate: MovieServiceBrowseItemDelegate)
-    
     func itemBecameVisible(id: ModelId)
 }
 

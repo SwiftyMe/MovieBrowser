@@ -15,15 +15,7 @@ import MovieBEService
 ///
 /// View-model class for a user-registered movie
 ///
-class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, ModelObjectOptionalAccessor, ViewLifeCycleEvents  {
-
-    static func == (lhs: MovieRegisterItemViewModel, rhs: MovieRegisterItemViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
+class MovieRegisterItemViewModel: ObservableObject, IdentifiableHashable, ViewLifeCycleEvents, ModelObjectOptionalAccessor  {
     
     /// Identifiable conformance
     var id: Int {
@@ -41,8 +33,8 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, Mode
     
     @Published var title: String = ""
     @Published var overview: String = ""
-    @Published var rating: String = "My Rating:"
     @Published var posterImage: UIImage? = nil
+    @Published var rating: String = "My Rating:"
     
     func onAppear() {
         
@@ -50,13 +42,13 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, Mode
         
         // assert(!appearing) TODO: check why this happens
 
-        self.updateRating()
+        self.updatePropertyRating()
         
         guard !appeared else {
             return
         }
 
-        updateMovieModel()
+        movieService.fetchDetailModel(id: Int(movie.tmdbId))
     
         appeared = true
     }
@@ -68,42 +60,54 @@ class MovieRegisterItemViewModel: ObservableObject, Identifiable, Hashable, Mode
 
     init(movie: DBMovie, service: MovieService) {
       
-        print("MovieRegisterItemViewModel - init \(movie.tmdbId)")
+        print("\(type(of: self)) - init \(movie.tmdbId)")
         
         self.movie = movie
-        self.service = service
-        self.model = nil
+        self.movieService = service
     }
     
     deinit {
-        
-        print("MovieRegisterItemViewModel - deinit \(movie.tmdbId)")
+        print("\(type(of: self)) - deinit \(id)")
     }
     
     private var movie: DBMovie
     private var model: MovieDetailModel?
-    private let service: MovieService
+    private var movieService: MovieService
     private var appeared = false
 }
 
+extension MovieRegisterItemViewModel {
+    
+    private func updateProperties() {
+        print("MovieRegisterItemViewModel - updateProperties \(movie.tmdbId)")
+        updatePropertyTitle()
+        updatePropertyOverview()
+        updatePropertyPosterImage()
+    }
+    
+    private func updatePropertyTitle() {
+        title = modelObject?.title ?? ""
+    }
+    
+    private func updatePropertyOverview() {
+        overview = modelObject?.overview ?? ""
+    }
+    
+    private func updatePropertyPosterImage() {
+        posterImage = modelObject?.posterImage
+    }
+
+    private func updatePropertyRating() {
+        rating = movie.rating == 0 ? "My Rating:" : String(format: "My Rating: %.1f", 0.1 * Double(movie.rating))
+    }
+}
 
 extension MovieRegisterItemViewModel {
     
-    func updateTitle() {
-        title = model?.title ?? ""
-    }
-    
-    func updateOverview() {
-        overview = model?.overview ?? ""
-    }
-    
-    func updateRating() {
-        rating = movie.rating == 0 ? "My Rating:" : String(format: "My Rating: %.1f", 0.1 * Double(movie.rating))
-    }
-    
-    func updateMovieModel() {
-        
-        
+    func updateModel(model: MovieDetailModel) {
+        self.model = model
+        updateProperties()
     }
 }
+
 

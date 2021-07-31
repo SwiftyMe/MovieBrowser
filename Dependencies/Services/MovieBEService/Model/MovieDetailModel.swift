@@ -37,7 +37,7 @@ public struct MovieDetailModel: Model {
         self.voteAverage = model.voteAverage
         self.posterImage = posterImage
     }
-    
+
     public init() {
         id = -1
         posterImage = nil

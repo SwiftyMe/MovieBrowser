@@ -25,7 +25,7 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
     let averageVote: String?
     var genres: String
     
-    @Published var posterImage: UIImage?
+    let posterImage: UIImage?
     
     @Published var rating: Double = 0 {
         didSet {
@@ -45,8 +45,6 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
         }
 
         print("MovieRegisterDetailViewModel - onAppear \(movie.tmdbId)")
-
-        updatePropertyImage()
 
         appeared = true
     }
@@ -86,7 +84,8 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
         title = model.title
         releaseDate = model.releaseDate ?? ""
         overview = model.overview
-        genres = ""
+        posterImage = model.posterImage
+        genres = model.genres.map({ $0.description }).joined(separator:", ")
         averageVote = model.voteAverage == nil ? nil : String(format:"%.1f", model.voteAverage!)
         
         updatePropertyGenres()
@@ -135,9 +134,6 @@ extension MovieRegisterDetailViewModel {
 }
 
 extension MovieRegisterDetailViewModel {
-    
-    private func updatePropertyImage() {
-    }
     
     func updatePropertyRating() {
         rating = Double(movie.rating)

@@ -10,7 +10,7 @@ import MovieBEService
 
 struct MovieRegisterListView: View {
     
-    @ObservedObject var viewModel: MovieRegisterListViewModel
+    @StateObject var viewModel: MovieRegisterListViewModel
     
     /// Private
     
