@@ -33,6 +33,12 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
         }
     }
     
+    @Published var category = DBCategory.seen {
+        didSet {
+            updateModelCategory()
+        }
+    }
+    
     @Published var notes: [MovieNoteItemViewModel] = []
 
     func onAppear() {
@@ -50,7 +56,7 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
     }
     
     func onDisappear() {
-        
+
         storeSave()
 
         print("MovieRegisterDetailViewModel - onDisappear \(movie.tmdbId)")
@@ -90,6 +96,7 @@ class MovieRegisterDetailViewModel: ObservableObject, ViewLifeCycleEvents, DBCon
         
         updatePropertyGenres()
         updatePropertyRating()
+        updatePropertyCategory()
         updatePropertyNotes()
     }
     
@@ -141,6 +148,14 @@ extension MovieRegisterDetailViewModel {
     
     func updateModelRating() {
         movie.rating = Int16(rating)
+    }
+    
+    func updatePropertyCategory() {
+        category = DBCategory(rawValue:movie.category)!
+    }
+    
+    func updateModelCategory() {
+        movie.category = Int16(category.rawValue)
     }
     
     func updatePropertyGenres() {

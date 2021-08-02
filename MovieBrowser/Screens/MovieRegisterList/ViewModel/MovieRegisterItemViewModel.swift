@@ -39,7 +39,7 @@ class MovieRegisterItemViewModel: ObservableObject, IdentifiableHashable, ViewLi
     func onAppear() {
         
         print("MovieRegisterItemViewModel - onAppear \(id)")
-        
+
         // assert(!appearing) TODO: check why this happens
 
         self.updatePropertyRating()
@@ -61,7 +61,7 @@ class MovieRegisterItemViewModel: ObservableObject, IdentifiableHashable, ViewLi
     init(movie: DBMovie, service: MovieService) {
       
         print("\(type(of: self)) - init \(movie.tmdbId)")
-        
+
         self.movie = movie
         self.movieService = service
     }
@@ -79,7 +79,6 @@ class MovieRegisterItemViewModel: ObservableObject, IdentifiableHashable, ViewLi
 extension MovieRegisterItemViewModel {
     
     private func updateProperties() {
-        print("MovieRegisterItemViewModel - updateProperties \(movie.tmdbId)")
         updatePropertyTitle()
         updatePropertyOverview()
         updatePropertyPosterImage()

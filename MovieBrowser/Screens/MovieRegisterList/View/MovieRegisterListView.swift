@@ -18,6 +18,7 @@ struct MovieRegisterListView: View {
     @Environment(\.managedObjectContext) private var moc
     @Environment(\.movieService) private var movieService
     
+    @State private var searchVisible = false
     @State private var selectedMovie: MovieRegisterItemViewModel? = nil
     @State private var editMode = EditMode.inactive
 
@@ -36,6 +37,25 @@ struct MovieRegisterListView: View {
             .padding(.vertical,7)
             .background(Color.white)
             .environment(\.editMode, $editMode)
+            
+            StyleColor.divider.frame(height:1)
+                .padding(.horizontal,5)
+            
+            if searchVisible {
+                
+                // SearchTextField(placeholder: "Enter text", searchText: $viewModel.searchText)
+            }
+            else {
+                
+                Picker("", selection:$viewModel.category) {
+                    ForEach(Array(DBCategory.allCases)) { list in
+                        Text(list.description)
+                            .tag(list)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+            }
         }
         .configureNavigationBar(leading:navbarLeadingView, center:navbarCenterView, trailing: navbarTrailingView)
         .onAppear(perform:onAppear)
@@ -104,5 +124,23 @@ struct MovieRegisterListView_Previews: PreviewProvider {
     static let service = MovieServiceImplementation()
     static var previews: some View {
         MovieRegisterListView(viewModel: MovieRegisterListViewModel(moc: store.managedObjectContext!, movieService:service))
+    }
+}
+
+///
+///
+///
+extension DBCategory: CustomStringConvertible, Identifiable {
+    
+    public var id: String {
+        description
+    }
+    
+    public var description: String {
+        switch self {
+            case .seen: return "Seen"
+            case .notSeen: return "Not Seen"
+            case .archived: return "Archived"
+        }
     }
 }

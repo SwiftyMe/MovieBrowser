@@ -106,11 +106,22 @@ extension MovieRegisterDetailView {
     private func ratingView() -> some View {
         
         VStack(alignment:.leading, spacing:5) {
+            
             HStack {
                 Text("Rating:").fontWeight(.medium)
                 Text(String(format: "%.1f", 0.1 * viewModel.rating))
             }
+            
             Slider(value: $viewModel.rating, in: 0...99)
+            
+            Picker("", selection:$viewModel.category) {
+                ForEach(Array(DBCategory.allCases)) { list in
+                    Text(list.description)
+                        .tag(list)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.top)
         }
     }
     

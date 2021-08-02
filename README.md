@@ -6,7 +6,8 @@ upcoming). The browse/list screen supports continuous scrolling in all the datab
 made also in the lists. Furthermore, a detail view of a movie can be shown in a separate detail screen by tapping a movie in the list. In the 
 detail screen a movie can be selected to be saved in a user register. The user's movie register is also a screen with a list of movies, that
 is the movies selected to be part of the register. Registered items can be removed again from the register.  In the register screen, a movie 
-can be tapped on and shown in a separate screen where the user can rate it and make notes on it.
+can be tapped on and shown in a separate screen where the user can rate it and make notes on it. Finally a registered movie can be put into
+different categories: Seen, Not seen, Archived
 
 In software terms and generally speaking, the solution demonstrates my abilities to:
 

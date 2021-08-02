@@ -19,17 +19,25 @@ class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBConte
 
     @Published var error: String?
     
+    @Published var category = DBCategory.seen {
+        didSet {
+            updateMovies()
+        }
+    }
+    
     @Published var movies: [MovieRegisterItemViewModel] = []
     
     func onAppear() {
         
-        sortMovies()
+        print("MovieRegisterListViewModel:onAppear")
+        
+        updateMovies()
         
          guard !appeared else {
              return
          }
 
-        updateMovies()
+        fetchMovies()
     
         appeared = true
     }
@@ -53,19 +61,21 @@ class MovieRegisterListViewModel: ObservableObject, ViewLifeCycleEvents, DBConte
     
     var moc: NSManagedObjectContext
     
+    private var originals: [MovieRegisterItemViewModel] = []
+
     private var movieService: MovieService
     private var appeared = false
 }
 
 extension MovieRegisterListViewModel {
     
-    func updateMovies() {
+    func fetchMovies() {
 
         do {
             
-            movies = try DBObjects.fetchAll(moc:moc).map( { MovieRegisterItemViewModel(movie:$0!, service:movieService) } )
+            originals = try DBObjects.fetchAll(moc:moc).map( { MovieRegisterItemViewModel(movie:$0!, service:movieService) } )
             
-            sortMovies()
+            updateMovies()
         }
         catch {
             
@@ -73,7 +83,14 @@ extension MovieRegisterListViewModel {
         }
     }
     
-    func sortMovies() {
+    func updateMovies() {
+        
+        guard !originals.isEmpty else {
+            return
+        }
+        
+        movies = originals.filter({ $0.registeredMovie.category == category.rawValue })
+        
         movies.sort(by: { $0.registeredMovie.rating > $1.registeredMovie.rating })
     }
 }

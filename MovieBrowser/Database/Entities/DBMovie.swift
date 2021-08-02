@@ -12,6 +12,10 @@ enum DBPriority: Int16 {
     case low, medium, high
 }
 
+enum DBCategory: Int16, CaseIterable {
+    case seen, notSeen, archived
+}
+
 class DBMovie: NSManagedObject, DBCreatable  {
 
     // Attributes
@@ -20,6 +24,7 @@ class DBMovie: NSManagedObject, DBCreatable  {
     @NSManaged var created: Date
     @NSManaged var rating: Int16 // 0 ... 100
     @NSManaged var priority: Int16 // enum DBPriority
+    @NSManaged var category: Int16 // enum DBCategory
     
     // Relations
 
